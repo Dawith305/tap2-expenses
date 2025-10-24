@@ -25,7 +25,6 @@
 		TableRow
 	} from '$lib/components/ui/table';
 	import { Plus, Edit, Trash2, DollarSign } from 'lucide-svelte';
-	import Navigation from '$lib/components/Navigation.svelte';
 	import { DatePicker } from '$lib/components/ui/date-picker';
 	import { Loading } from '$lib/components/ui/loading';
 
@@ -142,8 +141,6 @@
 		}).format(amount);
 	}
 </script>
-
-<Navigation />
 
 <main class="container mx-auto px-4 py-8">
 	<div class="mb-8 flex items-center justify-between">

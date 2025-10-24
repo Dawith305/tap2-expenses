@@ -16,7 +16,6 @@
 		DialogTrigger
 	} from '$lib/components/ui/dialog';
 	import { Plus, Upload, Trash2, Edit } from 'lucide-svelte';
-	import Navigation from '$lib/components/Navigation.svelte';
 	import { Loading } from '$lib/components/ui/loading';
 
 	let newExpenseType = $state<NewExpenseType>({
@@ -90,8 +89,6 @@
 		}
 	}
 </script>
-
-<Navigation />
 
 <main class="container mx-auto px-4 py-8">
 	<div class="mb-8 flex items-center justify-between">
