@@ -1,10 +1,6 @@
 <script lang="ts">
 	import CalendarIcon from '@lucide/svelte/icons/calendar';
-	import {
-		DateFormatter,
-		type DateValue,
-		getLocalTimeZone
-	} from '@internationalized/date';
+	import { DateFormatter, type DateValue, getLocalTimeZone } from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
@@ -33,9 +29,9 @@
 				class: 'w-full justify-start text-left font-normal'
 			}),
 			!value && 'text-muted-foreground',
-			disabled && 'opacity-50 cursor-not-allowed'
+			disabled && 'cursor-not-allowed opacity-50'
 		)}
-		disabled={disabled}
+		{disabled}
 	>
 		<CalendarIcon class="mr-2 h-4 w-4" />
 		{value ? df.format(value.toDate(getLocalTimeZone())) : placeholder}

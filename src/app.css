@@ -2,7 +2,7 @@
 
 @theme {
 	--breakpoint-xs: 475px;
-	
+
 	/* shadcn-svelte CSS variables */
 	--color-background: hsl(0 0% 100%);
 	--color-foreground: hsl(222.2 84% 4.9%);

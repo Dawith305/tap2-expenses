@@ -27,6 +27,7 @@
 	import { Plus, Edit, Trash2, DollarSign } from 'lucide-svelte';
 	import Navigation from '$lib/components/Navigation.svelte';
 	import { DatePicker } from '$lib/components/ui/date-picker';
+	import { Loading } from '$lib/components/ui/loading';
 
 	let newExpense = $state<NewExpense>({
 		typeId: '',
@@ -38,28 +39,25 @@
 	const convex = getContext<ConvexReactClient>('convex');
 	let expenses = $state<Expense[]>([]);
 	let expenseTypes = $state<ExpenseType[]>([]);
-	let intervalId: ReturnType<typeof setInterval> | null = null;
+	let isLoading = $state(true);
+
+	const loadData = async () => {
+		try {
+			const [expensesData, typesData] = await Promise.all([
+				convex.query(api.expenses.getExpenses, {}),
+				convex.query(api.expenses.getExpenseTypes, {})
+			]);
+			expenses = expensesData;
+			expenseTypes = typesData;
+		} catch (error) {
+			console.error('Error loading data:', error);
+		} finally {
+			isLoading = false;
+		}
+	};
 
 	onMount(() => {
-		const loadData = async () => {
-			try {
-				const [expensesData, typesData] = await Promise.all([
-					convex.query(api.expenses.getExpenses, {}),
-					convex.query(api.expenses.getExpenseTypes, {})
-				]);
-				expenses = expensesData;
-				expenseTypes = typesData;
-			} catch (error) {
-				console.error('Error loading data:', error);
-			}
-		};
-
 		loadData();
-		intervalId = setInterval(loadData, 2000);
-
-		return () => {
-			if (intervalId) clearInterval(intervalId);
-		};
 	});
 
 	let isDialogOpen = $state(false);
@@ -73,7 +71,9 @@
 				description: newExpense.description,
 				date: newExpense.date ? newExpense.date.toDate(getLocalTimeZone()).getTime() : Date.now()
 			};
-			convex.mutation(api.expenses.createExpense, expenseData);
+			convex.mutation(api.expenses.createExpense, expenseData).then(() => {
+				loadData();
+			});
 			newExpense = {
 				typeId: '',
 				amount: 0,
@@ -98,7 +98,9 @@
 				description: newExpense.description,
 				date: newExpense.date ? newExpense.date.toDate(getLocalTimeZone()).getTime() : Date.now()
 			};
-			convex.mutation(api.expenses.updateExpense, expenseData);
+			convex.mutation(api.expenses.updateExpense, expenseData).then(() => {
+				loadData();
+			});
 			editingExpense = null;
 			newExpense = {
 				typeId: '',
@@ -123,7 +125,9 @@
 
 	function handleDeleteExpense(id: Id<'expenses'>) {
 		if (confirm('Are you sure you want to delete this expense?')) {
-			convex.mutation(api.expenses.deleteExpense, { id });
+			convex.mutation(api.expenses.deleteExpense, { id }).then(() => {
+				loadData();
+			});
 		}
 	}
 
@@ -201,7 +205,7 @@
 					<div class="flex justify-end gap-2">
 						<button
 							type="button"
-							class="ring-offset-background focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md border-2 border-gray-400 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-900 transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+							class="inline-flex h-10 items-center justify-center rounded-md border-2 border-gray-400 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-900 ring-offset-background transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 							onclick={() => {
 								isDialogOpen = false;
 								editingExpense = null;
@@ -211,7 +215,7 @@
 						</button>
 						<button
 							type="button"
-							class="ring-offset-background focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium whitespace-nowrap text-white transition-colors hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+							class="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium whitespace-nowrap text-white ring-offset-background transition-colors hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 							onclick={() => {
 								if (editingExpense) {
 									handleUpdateExpense();
@@ -228,7 +232,11 @@
 		</Dialog>
 	</div>
 
-	{#if expenses && expenses.length > 0}
+	{#if isLoading}
+		<div class="py-12 text-center">
+			<Loading size="lg" />
+		</div>
+	{:else if expenses && expenses.length > 0}
 		<Card>
 			<CardHeader>
 				<CardTitle class="flex items-center gap-2">
@@ -270,7 +278,7 @@
 									<div class="flex justify-end gap-2">
 										<button
 											type="button"
-											class="ring-offset-background focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+											class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 											onclick={() => {
 												handleEditExpense(expense);
 											}}
@@ -279,7 +287,7 @@
 										</button>
 										<button
 											type="button"
-											class="ring-offset-background focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+											class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 											onclick={() => {
 												handleDeleteExpense(expense._id);
 											}}
