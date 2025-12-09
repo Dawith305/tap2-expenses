@@ -1696,10 +1696,10 @@ eslint-plugin-storybook@^9.1.13:
   dependencies:
     "@typescript-eslint/utils" "^8.8.1"
 
-eslint-plugin-svelte@^3.12.4:
-  version "3.12.5"
-  resolved "https://registry.npmjs.org/eslint-plugin-svelte/-/eslint-plugin-svelte-3.12.5.tgz"
-  integrity sha512-4KRG84eAHQfYd9OjZ1K7sCHy0nox+9KwT+s5WCCku3jTim5RV4tVENob274nCwIaApXsYPKAUAZFBxKZ3Wyfjw==
+eslint-plugin-svelte@^3.13.1:
+  version "3.13.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-svelte/-/eslint-plugin-svelte-3.13.1.tgz#f994351636f43c1d911cb9e7d49cecc8a9fc019a"
+  integrity sha512-Ng+kV/qGS8P/isbNYVE3sJORtubB+yLEcYICMkUWNaDTb0SwZni/JhAYXh/Dz/q2eThUwWY0VMPZ//KYD1n3eQ==
   dependencies:
     "@eslint-community/eslint-utils" "^4.6.1"
     "@jridgewell/sourcemap-codec" "^1.5.0"
